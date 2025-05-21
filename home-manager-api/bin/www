@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('home-manager-api:server');
 var http = require('http');
+var { poolPromise } = require('../config/db');
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +21,18 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+poolPromise
+  .then(() => {
+    server.listen(port);
+    server.on('error', onError);
+    server.on('listening', onListening);
+    console.log('✅ Connected to DB. Server started.');
+  })
+  .catch(err => {
+    console.error('❌ DB connection failed. Server not started.', err);
+    process.exit(1);
+  });
 
 /**
  * Listen on provided port, on all network interfaces.
