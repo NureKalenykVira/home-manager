@@ -36,6 +36,9 @@ jobs:
       - name: List contents of dist
         run: ls -lh ./home-manager-api/dist
 
+      - name: Check dist presence
+        run:  ls -lh home-manager-api/dist cat home-manager-api/dist/index.html || echo "No index.html"
+
       # Архівування
       - name: Zip app without node_modules
         working-directory: ./home-manager-api
