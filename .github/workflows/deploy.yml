@@ -39,9 +39,12 @@ jobs:
           cat ./home-manager-api/dist/index.html || echo "index.html not found"
 
       # Архівування
-      - name: 🗜Create deployable zip (без node_modules)
+      - name: Create deployable zip (без node_modules)
         working-directory: ./home-manager-api
         run: zip -r ../app.zip . -x "**/node_modules/**" "**/.git/**"
+
+      - name: Check contents of ZIP
+        run: unzip -l app.zip | grep index.html || echo "index.html not in zip"
 
       # Azure Login
       - name: Login to Azure
