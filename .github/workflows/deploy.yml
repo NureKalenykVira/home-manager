@@ -38,6 +38,12 @@ jobs:
           ls -lh ./home-manager-api/dist
           cat ./home-manager-api/dist/index.html || echo "index.html not found"
 
+      - name: Move Angular output manually
+        run: |
+          rm -rf home-manager-api/dist
+          mkdir home-manager-api/dist
+          cp -r home-manager-project/dist/browser/* home-manager-api/dist/
+      
       # Архівування
       - name: Create deployable zip (без node_modules)
         working-directory: ./home-manager-api
