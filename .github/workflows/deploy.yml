@@ -1,0 +1,42 @@
+name: Deploy to Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install frontend dependencies
+        working-directory: ./home-manager-project
+        run: npm install
+
+      - name: Build Angular project
+        working-directory: ./home-manager-project
+        run: npm run build -- --output-path=../home-manager-api/dist
+
+      - name: Install backend dependencies
+        working-directory: ./home-manager-api
+        run: npm install
+
+      - name: Zip backend with frontend dist
+        working-directory: ./home-manager-api
+        run: zip -r ../app.zip .
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: home-manager-app
+          publish-profile: ${{ secrets.AZURE_CREDENTIALS }}
+          package: ./app.zip
