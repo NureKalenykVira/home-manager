@@ -1,0 +1,21 @@
+<div class="register-container">
+  <div class="register-title">Реєстрація</div>
+
+  <label for="username">Ім'я користувача</label>
+  <input id="username" type="text" placeholder="Введіть ім'я" [(ngModel)]="username" />
+
+  <label for="email">Email</label>
+  <input id="email" type="email" placeholder="Введіть Email" [(ngModel)]="email" />
+
+  <label for="password">Пароль</label>
+  <input id="password" type="password" placeholder="Введіть пароль" [(ngModel)]="password" />
+
+  <label for="confirmPassword">Підтвердження пароля</label>
+  <input id="confirmPassword" type="password" placeholder="Підтвердіть пароль" [(ngModel)]="confirmPassword" />
+
+  <button (click)="register()">Зареєструватися</button>
+
+  <div class="login-link" (click)="register()">
+    Вже маєте обліковий запис? Увійти
+  </div>
+</div>

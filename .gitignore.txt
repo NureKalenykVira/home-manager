@@ -1,0 +1,7 @@
+home-manager-project/node_modules/
+home-manager-project/.angular/
+home-manager-project/dist/
+home-manager-project/.vscode/
+
+home-manager-api/node_modules/
+home-manager-api/.env

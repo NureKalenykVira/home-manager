@@ -1,0 +1,96 @@
+<div class="task-list-container">
+  <h2>Список завдань</h2>
+  <ul>
+    <li *ngFor="let task of tasks">
+      <div class="task-card" (click)="toggleTaskDetails(task.taskId)">
+        <h3>
+          <input type="checkbox"
+            [checked]="task.isCompleted"
+            (click)="toggleCompleted(task)" />
+          {{ task.title }}</h3>
+        <p>Виконати до: {{ task.dueDate | date:'dd.MM.yyyy' }}</p>
+        <p [class.completed]="task.isCompleted">
+          {{ task.isCompleted ? 'Виконано' : 'Не виконано' }}
+        </p>
+      </div>
+
+      <div *ngIf="expandedTaskId === task.taskId" class="task-details">
+        <p><strong>Опис:</strong> {{ task.description }}</p>
+        <p><strong>Створено:</strong> {{ task.createdAt | date:'dd.MM.yyyy, HH:mm' }}</p>
+        <p><strong>Відповідальний:</strong> {{ getAssigneeName(task.assigneeId) }}</p>
+        <div class="attachments-list" *ngIf="attachments[task.taskId]?.length">
+          <p><strong>Вкладення:</strong></p>
+          <ul>
+            <li *ngFor="let file of attachments[task.taskId]">
+              <a [href]="file.FilePath" target="_blank">
+                {{ extractFileName(file.FilePath) }}
+              </a>
+            </li>
+          </ul>
+        </div>
+        <button class="close-btn" (click)="openDeleteConfirm(task.taskId)">
+          Видалити завдання
+        </button>
+        <div class="comments-block">
+          <h4>Коментарі</h4>
+          <ul>
+            <li *ngFor="let comment of comments[task.taskId]">
+              <strong>{{ comment.userName }}:</strong> {{ comment.text }}
+              <button class="delete-btn" (click)="deleteComment(task.taskId, comment.commentId)">🗑</button>
+            </li>
+          </ul>
+          <input type="text" [(ngModel)]="commentTexts[task.taskId]" placeholder="Новий коментар..." />
+          <button (click)="addComment(task.taskId)">Додати коментар</button>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <button class="add-task-btn" (click)="openModal()">＋</button>
+
+  <!-- Модальні вікна -->
+  <div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-content">
+    <h2>Нове завдання</h2>
+    <label>
+      Назва
+      <input type="text" [(ngModel)]="newTask.title" />
+    </label>
+    <label>
+      Опис
+      <textarea [(ngModel)]="newTask.description"></textarea>
+    </label>
+    <label>
+      Відповідальний
+      <select [(ngModel)]="newTask.assigneeId">
+        <option *ngFor="let user of familyUsers" [value]="user.userId">
+          {{ user.userName }}
+        </option>
+      </select>
+    </label>
+    <label>
+      Виконати до:
+      <input type="date" [(ngModel)]="newTask.dueDate" />
+    </label>
+    <label>
+      Додати вкладення
+      <input type="file" multiple (change)="onFileSelected($event)" />
+    </label>
+    <div class="modal-buttons">
+      <button (click)="addTask()">Додати</button>
+      <button (click)="closeModal()">Скасувати</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="delete-modal-overlay" *ngIf="isDeleteConfirmOpen">
+  <div class="delete-modal-content">
+    <h2>Підтвердження</h2>
+    <p>Ви впевнені, що хочете видалити це завдання?</p>
+    <div class="delete-modal-buttons">
+      <button (click)="confirmDelete()">Так, видалити</button>
+      <button (click)="closeDeleteConfirm()">Скасувати</button>
+    </div>
+  </div>
+</div>

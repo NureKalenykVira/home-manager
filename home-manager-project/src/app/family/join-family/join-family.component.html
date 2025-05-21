@@ -1,0 +1,30 @@
+<form class="add-family-container" [formGroup]="familyForm" (ngSubmit)="createFamily()">
+  <h2>Приєднатися або створити сім'ю</h2>
+
+  <div class="join-section">
+    <h3>Приєднатися до сім'ї</h3>
+    <label>
+      Код родини
+      <input type="text" formControlName="joinCode" [class.invalid]="joinCode?.invalid && joinCode?.touched" />
+      <span class="error" *ngIf="joinCode?.hasError('required') && joinCode?.touched">Код обов’язковий</span>
+      <span class="error" *ngIf="joinCode?.hasError('invalidCode')">Такого коду не існує</span>
+    </label>
+    <button (click)="joinFamily()">Приєднатися</button>
+  </div>
+
+  <hr>
+
+  <div class="create-section">
+    <h3>Створити нову сім'ю</h3>
+    <label>
+      Назва сім’ї
+      <input type="text" formControlName="name" [class.invalid]="name?.invalid && name?.touched" />
+      <span class="error" *ngIf="name?.invalid && name?.touched">Назва обов’язкова</span>
+    </label>
+    <label>
+      Опис сім’ї (необов’язково)
+      <input type="text" formControlName="description" />
+    </label>
+    <button (click)="createFamily()">Створити сім'ю</button>
+  </div>
+</form>

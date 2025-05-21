@@ -1,0 +1,18 @@
+<div class="shopping-list-container">
+  <h2>Список покупок</h2>
+
+  <form (submit)="addItem(); $event.preventDefault();">
+    <input type="text" [(ngModel)]="newItem" name="newItem" placeholder="Додати товар..." />
+    <button type="submit">＋</button>
+  </form>
+
+  <ul>
+    <li *ngFor="let item of shoppingItems">
+      <label>
+        <input type="checkbox" [(ngModel)]="item.isBought" (change)="toggleBought(item)" />
+        <span [class.bought]="item.isBought">{{ item.itemName }}</span>
+      </label>
+      <button class="delete-btn" (click)="deleteItem(item.itemId)">🗑</button>
+    </li>
+  </ul>
+</div>

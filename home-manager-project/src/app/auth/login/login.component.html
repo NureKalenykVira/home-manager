@@ -1,0 +1,15 @@
+<div class="login-container">
+  <div class="login-title">Вас вітає Home Manager</div>
+
+  <label for="email">Email</label>
+  <input id="email" type="email" placeholder="Введіть Email" [(ngModel)]="email" />
+
+  <label for="password">Пароль</label>
+  <input id="password" type="password" placeholder="Введіть пароль" [(ngModel)]="password" />
+
+  <button (click)="login()">Увійти</button>
+
+  <div class="register-link" (click)="navigateToRegister()">
+    Немає облікового запису? Зареєструватися
+  </div>
+</div>

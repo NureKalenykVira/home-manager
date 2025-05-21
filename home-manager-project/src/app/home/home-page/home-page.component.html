@@ -1,0 +1,57 @@
+<div class="home-container">
+  <div class="topbar">
+    <div class="logo">Home Manager</div>
+      <button *ngIf="!hasFamily" routerLink="/family/join" class="family-button">Додати сім’ю</button>
+      <button *ngIf="hasFamily" (click)="openFamilyModal()" class="family-button">Моя сім’я</button>
+      <span class="user-name"> {{ userName }}</span>
+    <div class="profile-icon">
+      <i class="fas fa-user-circle"></i>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="sidebar">
+      <button
+        [class.active]="selectedTab === 'tasks'"
+        routerLink="tasks"
+        (click)="selectTab('tasks')">
+        Список завдань
+      </button>
+
+      <button
+        [class.active]="selectedTab === 'shopping-list'"
+        routerLink="shopping-list"
+        (click)="selectTab('shopping-list')">
+        Список покупок
+      </button>
+
+      <button
+        [class.active]="selectedTab === 'calendar'"
+        routerLink="calendar"
+        (click)="selectTab('calendar')">
+        Календар
+      </button>
+    </div>
+
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-content">
+    <h2>Код приєднання до сім’ї</h2>
+
+    <div class="join-code-wrapper">
+      <input type="text" [value]="joinCode" readonly class="join-code-input" />
+      <button class="copy-btn" (click)="copyCode()">📋</button>
+    </div>
+    <div class="copy-feedback" *ngIf="copied">Скопійовано ✅</div>
+
+    <div class="modal-buttons">
+      <button class="red-btn" (click)="leaveFamily()">Вийти з родини</button>
+      <button class="gray-btn" (click)="isModalOpen = false">Закрити</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="calendar-container">
+  <h2>Календар подій</h2>
+
+  <form (submit)="addEvent(); $event.preventDefault()" class="calendar-form">
+    <input type="text" [(ngModel)]="newTitle" name="newTitle" placeholder="Назва події" />
+    <input type="date" [(ngModel)]="newDate" name="newDate" />
+    <button type="submit">Додати</button>
+  </form>
+
+  <div *ngFor="let date of groupedEvents | keyvalue">
+    <div class="calendar-date">{{ date.key }}</div>
+    <ul>
+      <li *ngFor="let event of date.value">
+        <div class="calendar-event">
+          {{ event.title }}
+          <button class="delete-btn" (click)="deleteEvent(event.entryId)">🗑</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
