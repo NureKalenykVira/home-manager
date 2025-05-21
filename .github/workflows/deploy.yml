@@ -42,7 +42,7 @@ jobs:
         run: |
           rm -rf home-manager-api/dist
           mkdir home-manager-api/dist
-          cp -r home-manager-project/dist/browser/* home-manager-api/dist/
+          cp -r home-manager-project/dist/home-manager-project/* home-manager-api/dist/
       
       # Архівування
       - name: Create deployable zip (без node_modules)
