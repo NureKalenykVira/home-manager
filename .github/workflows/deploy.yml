@@ -18,14 +18,8 @@ jobs:
         with:
           node-version: '18'
 
-      # Вхід в Azure
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      # Build Angular
-      - name: Install frontend deps
+      # Збірка Angular
+      - name: Install frontend dependencies
         working-directory: ./home-manager-project
         run: npm install
 
@@ -33,16 +27,27 @@ jobs:
         working-directory: ./home-manager-project
         run: npm run build -- --output-path=../home-manager-api/dist
 
-      # Install backend & zip everything
-      - name: Install backend deps
+      # Збірка backend (разом із уже вкладеним dist/)
+      - name: Install backend dependencies
         working-directory: ./home-manager-api
         run: npm install
 
-      - name: Zip app
-        working-directory: ./home-manager-api
-        run: zip -r ../app.zip . . -x "**/node_modules/**" "**/.git/**" "**/.angular/**" "**/dist/**" "**/uploads/**"
+      # Перевіримо вміст dist
+      - name: List contents of dist
+        run: ls -lh ./home-manager-api/dist
 
-      # Deploy via Azure CLI
+      # Архівування
+      - name: Zip app without node_modules
+        working-directory: ./home-manager-api
+        run: zip -r ../app.zip . -x "**/node_modules/**" "**/.git/**"
+
+      # Вхід в Azure
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Деплой
       - name: Deploy to Azure Web App
         run: |
           az webapp deploy --resource-group home-manager-rg \
