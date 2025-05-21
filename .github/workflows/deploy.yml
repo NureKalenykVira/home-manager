@@ -40,7 +40,7 @@ jobs:
 
       - name: Zip app
         working-directory: ./home-manager-api
-        run: zip -r ../app.zip .
+        run: zip -r ../app.zip . . -x "**/node_modules/**" "**/.git/**" "**/.angular/**" "**/dist/**" "**/uploads/**"
 
       # Deploy via Azure CLI
       - name: Deploy to Azure Web App
