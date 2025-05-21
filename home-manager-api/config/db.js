@@ -1,6 +1,13 @@
 require('dotenv').config();
 const sql = require('mssql');
 
+const requiredEnv = ['DB_USER', 'DB_PASSWORD', 'DB_SERVER', 'DB_DATABASE'];
+requiredEnv.forEach(name => {
+  if (!process.env[name]) {
+    console.error(`Environment variable ${name} is not set`);
+  }
+});
+
 const dbConfig = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
