@@ -27,6 +27,12 @@ jobs:
         working-directory: ./home-manager-project
         run: npm run build -- --output-path=../home-manager-api/dist
 
+      - name: Move Angular output manually
+        run: | 
+          rm -rf home-manager-api/dist
+          mkdir home-manager-api/dist
+          cp -r home-manager-project/dist/home-manager-project/* home-manager-api/dist/
+
       # Backend
       - name: Install backend deps
         working-directory: ./home-manager-api
