@@ -4,7 +4,7 @@ const sql = require('mssql');
 const requiredEnv = ['DB_USER', 'DB_PASSWORD', 'DB_SERVER', 'DB_DATABASE'];
 requiredEnv.forEach(name => {
   if (!process.env[name]) {
-    console.error(`Environment variable ${name} is not set`);
+    throw new Error(`❌ Environment variable ${name} is not set`);
   }
 });
 
@@ -25,7 +25,10 @@ const poolPromise = new sql.ConnectionPool(dbConfig)
         console.log('Connected to SQL Server');
         return pool;
     })
-    .catch(err => console.log('Database Connection Failed! Bad Config: ', err));
+    .catch(err => {
+      console.error('❌ Database connection failed:', err);
+      throw err;
+  });
 
 module.exports = {
     sql, poolPromise
