@@ -1,4 +1,4 @@
-name: Deploy to Azure using Azure CLI
+name: Deploy to Azure Linux App Service
 
 on:
   push:
@@ -16,10 +16,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
 
       # Збірка Angular
-      - name: Install frontend dependencies
+      - name: Install frontend deps
         working-directory: ./home-manager-project
         run: npm install
 
@@ -27,33 +27,33 @@ jobs:
         working-directory: ./home-manager-project
         run: npm run build -- --output-path=../home-manager-api/dist
 
-      # Збірка backend (разом із уже вкладеним dist/)
-      - name: Install backend dependencies
+      # Backend
+      - name: Install backend deps
         working-directory: ./home-manager-api
         run: npm install
 
-      # Перевіримо вміст dist
-      - name: List contents of dist
-        run: ls -lh ./home-manager-api/dist
-
-      - name: Check dist presence
-        run:  ls -lh home-manager-api/dist cat home-manager-api/dist/index.html || echo "No index.html"
+      # Перевірка dist
+      - name: Check dist
+        run: |
+          ls -lh ./home-manager-api/dist
+          cat ./home-manager-api/dist/index.html || echo "index.html not found"
 
       # Архівування
-      - name: Zip app without node_modules
+      - name: 🗜Create deployable zip (без node_modules)
         working-directory: ./home-manager-api
         run: zip -r ../app.zip . -x "**/node_modules/**" "**/.git/**"
 
-      # Вхід в Azure
+      # Azure Login
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_LINUX }}
 
-      # Деплой
-      - name: Deploy to Azure Web App
+      # Deploy to App Service
+      - name: Deploy to Linux Web App
         run: |
-          az webapp deploy --resource-group home-manager-rg \
-                           --name home-manager-app \
-                           --src-path app.zip \
-                           --type zip
+          az webapp deploy \
+            --resource-group home-manager-rg \
+            --name home-manager-app-linux \
+            --src-path app.zip \
+            --type zip
