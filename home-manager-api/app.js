@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
+const { poolPromise } = require('./config/db');
 
 const app = express();
 
@@ -17,57 +18,25 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'dist', 'browser')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Роутери з обробкою помилок підключення
-try {
-  app.use('/', require('./routes/index'));
-} catch (e) {
-  console.error('Error loading /routes/index:', e.message);
-}
-try {
-  app.use('/users', require('./routes/users'));
-} catch (e) {
-  console.error('Error loading /routes/users:', e.message);
-}
-try {
-  app.use('/auth', require('./routes/auth'));
-} catch (e) {
-  console.error('Error loading /routes/auth:', e.message);
-}
-try {
-  app.use('/api/tasks', require('./routes/tasks'));
-} catch (e) {
-  console.error('Error loading /routes/tasks:', e.message);
-}
-try {
-  app.use('/api/family', require('./routes/family'));
-} catch (e) {
-  console.error('Error loading /routes/family:', e.message);
-}
-try {
-  app.use('/api/shopping', require('./routes/shopping'));
-} catch (e) {
-  console.error('Error loading /routes/shopping:', e.message);
-}
-try {
-  app.use('/api/calendar', require('./routes/calendar'));
-} catch (e) {
-  console.error('Error loading /routes/calendar:', e.message);
-}
-try {
-  app.use('/api/comments', require('./routes/comments'));
-} catch (e) {
-  console.error('Error loading /routes/comments:', e.message);
-}
-try {
-  app.use('/api/attachments', require('./routes/attachments'));
-} catch (e) {
-  console.error('Error loading /routes/attachments:', e.message);
-}
-try {
-  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-} catch (e) {
-  console.error('Error loading /uploads:', e.message);
-}
+poolPromise
+  .then(() => {
+    console.log('Database connection successful');
+
+    app.use('/', require('./routes/index'));
+    app.use('/users', require('./routes/users'));
+    app.use('/auth', require('./routes/auth'));
+    app.use('/api/tasks', require('./routes/tasks'));
+    app.use('/api/family', require('./routes/family'));
+    app.use('/api/shopping', require('./routes/shopping'));
+    app.use('/api/calendar', require('./routes/calendar'));
+    app.use('/api/comments', require('./routes/comments'));
+    app.use('/api/attachments', require('./routes/attachments'));
+    app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+  })
+  .catch(err => {
+    console.error('❌ Failed to connect to the database. Server not initialized.', err.message);
+    process.exit(1);
+  });
 
 // Angular SPA
 app.get('*', (_, res) => {
