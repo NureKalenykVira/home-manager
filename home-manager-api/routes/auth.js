@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { poolPromise, sql } = require('../config/db');
 
-const SECRET_KEY = 'your_secret_key';
+const SECRET_KEY = process.env.JWT_SECRET || 'your_secret_key';
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
@@ -38,8 +38,14 @@ router.post('/register', async (req, res) => {
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
-    console.log('Отримано логін-запит із тілом:', req.body);
-    const { email, password } = req.body;
+  console.log('🔐 Отримано логін-запит із тілом:', req.body);
+
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    console.warn('⚠️ Порожній email або пароль');
+    return res.status(400).json({ message: 'Email та пароль обовʼязкові.' });
+  }
 
   try {
     const pool = await poolPromise;
@@ -48,21 +54,35 @@ router.post('/login', async (req, res) => {
       .input('Email', sql.NVarChar, email)
       .query('SELECT * FROM [User] WHERE Email = @Email');
 
-    const user = result.recordset[0];
+    console.log('📦 Результат запиту до бази:', result.recordset);
 
+    const user = result.recordset[0];
     if (!user) {
+      console.warn('❌ Користувача не знайдено з email:', email);
       return res.status(404).json({ message: 'Користувача не знайдено.' });
     }
 
     const isMatch = await bcrypt.compare(password, user.PasswordHash);
     if (!isMatch) {
+      console.warn('🚫 Невірний пароль для:', email);
       return res.status(400).json({ message: 'Невірний пароль.' });
     }
 
     const token = jwt.sign({ userId: user.UserID }, SECRET_KEY, { expiresIn: '1h' });
-    res.status(200).json({ message: 'Вхід успішний!', token, userId: user.UserID, familyId: user.FamilyID, userName: user.UserName });
+
+    console.log('✅ Вхід успішний для:', email);
+
+    res.status(200).json({
+      message: 'Вхід успішний!',
+      token,
+      userId: user.UserID,
+      familyId: user.FamilyID,
+      userName: user.UserName
+    });
+
   } catch (error) {
-    res.status(500).json({ message: 'Помилка сервера', error });
+    console.error('🔥 Помилка під час логіну:', error.message, error.stack);
+    res.status(500).json({ message: 'Помилка сервера', error: error.message });
   }
 });
 
