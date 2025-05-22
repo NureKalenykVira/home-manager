@@ -18,44 +18,43 @@ jobs:
         with:
           node-version: '20'
 
-      # Встановлення залежностей та збірка Angular
+      # Встановлення залежностей фронтенду
       - name: Install frontend dependencies
         working-directory: ./home-manager-project
         run: npm install
 
+      # Збірка Angular до папки backend'у
       - name: Build Angular app
         working-directory: ./home-manager-project
         run: npm run build -- --configuration production --output-path=../home-manager-api/dist
 
-      # Встановлення залежностей бекенду (обов'язково включає @azure/storage-blob)
+      # Встановлення залежностей бекенду (включаючи @azure/storage-blob)
       - name: Install backend dependencies
         working-directory: ./home-manager-api
-        run: npm install --omit=dev
+        run: npm install
 
-      # Перевірка, чи є index.html
-      - name: Check build artifacts
+      # Перевірка наявності index.html
+      - name: Check dist/index.html
         run: |
-          ls -lh ./home-manager-api/dist || echo "No dist folder"
+          ls -lh ./home-manager-api/dist
           cat ./home-manager-api/dist/index.html || echo "index.html not found"
 
-      # Створення ZIP без node_modules
-      - name: Create deployment ZIP (excluding node_modules)
+      # Архівування разом з node_modules
+      - name: Create deployable ZIP (WITH node_modules)
         working-directory: ./home-manager-api
-        run: |
-          zip -r ../app.zip . -x "node_modules/*" ".git/*" ".github/*"
+        run: zip -r ../app.zip .
 
-      # Перевірка вмісту архіву
-      - name: Verify ZIP contents
-        run: unzip -l app.zip | grep index.html || echo "index.html not found in zip"
+      - name: Check ZIP contents
+        run: unzip -l app.zip | grep index.html || echo "index.html not in zip"
 
-      # Авторизація в Azure
+      # Вхід до Azure
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_LINUX }}
 
-      # Деплой у Web App
-      - name: Deploy to Azure Linux Web App
+      # Розгортання ZIP на Linux Web App
+      - name: Deploy to Azure App Service
         run: |
           az webapp deploy \
             --resource-group home-manager-rg \
