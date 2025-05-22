@@ -14,19 +14,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Статичні файли
+// Статичні Angular-файли
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'dist')));
-
-// Перенаправлення всіх інших маршрутів на index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
 
 poolPromise
   .then(() => {
     console.log('Database connection successful');
 
+    // API маршрути
     app.use('/', require('./routes/index'));
     app.use('/users', require('./routes/users'));
     app.use('/auth', require('./routes/auth'));
@@ -37,15 +33,15 @@ poolPromise
     app.use('/api/comments', require('./routes/comments'));
     app.use('/api/attachments', require('./routes/attachments'));
     app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+    // Angular SPA fallback (має бути в кінці)
+    app.get('*', (_, res) => {
+      res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    });
   })
   .catch(err => {
-    console.error('❌ Failed to connect to the database. Server not initialized.', err.message);
+    console.error('Failed to connect to the database. Server not initialized.', err.message);
     process.exit(1);
   });
-
-// Angular SPA
-app.get('*', (_, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'browser', 'index.html'));
-});
 
 module.exports = app;
