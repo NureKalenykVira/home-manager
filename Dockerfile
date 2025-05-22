@@ -19,7 +19,7 @@ WORKDIR /usr/src/app
 COPY home-manager-api ./home-manager-api
 
 # Копіюємо зібраний Angular в dist
-COPY --from=builder /app/home-manager-project/dist ./home-manager-api/dist
+COPY --from=builder /app/home-manager-project/dist/home-manager-project ./home-manager-api/dist
 
 WORKDIR /usr/src/app/home-manager-api
 
