@@ -1,4 +1,4 @@
-name: Deploy to Azure Linux App Service
+name: Build and Deploy Docker Image to Azure
 
 on:
   push:
@@ -10,54 +10,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      # Встановлення залежностей фронтенду
-      - name: Install frontend dependencies
-        working-directory: ./home-manager-project
-        run: npm install
-
-      # Збірка Angular до папки backend'у
-      - name: Build Angular app
-        working-directory: ./home-manager-project
-        run: npm run build -- --configuration production --output-path=../home-manager-api/dist
-
-      # Встановлення залежностей бекенду (включаючи @azure/storage-blob)
-      - name: Install backend dependencies
-        working-directory: ./home-manager-api
-        run: npm install
-
-      # Перевірка наявності index.html
-      - name: Check dist/index.html
-        run: |
-          ls -lh ./home-manager-api/dist
-          cat ./home-manager-api/dist/index.html || echo "index.html not found"
-
-      # Архівування разом з node_modules
-      - name: Create deployable ZIP (WITH node_modules)
-        working-directory: ./home-manager-api
-        run: zip -r ../app.zip .
-
-      - name: Check ZIP contents
-        run: unzip -l app.zip | grep index.html || echo "index.html not in zip"
-
-      # Вхід до Azure
-      - name: Azure Login
+      - name: Login to Azure
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS_LINUX }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Розгортання ZIP на Linux Web App
-      - name: Deploy to Azure App Service
+      - name: Build and Push Docker image
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and push
         run: |
-          az webapp deploy \
-            --resource-group home-manager-rg \
-            --name home-manager-app-linux \
-            --src-path app.zip \
-            --type zip
+          docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/home-manager-api:latest ./home-manager-api
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/home-manager-api:latest
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: home-manager-app-linux
+          images: ${{ secrets.REGISTRY_LOGIN_SERVER }}/home-manager-api:latest
