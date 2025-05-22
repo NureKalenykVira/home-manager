@@ -16,6 +16,7 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "~1.9.1",
     "mssql": "^11.0.1",
-    "@azure/storage-blob": "^12.14.0"
+    "@azure/storage-blob": "^12.14.0",
+    "multer": "^1.4.5"
   }
 }
