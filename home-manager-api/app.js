@@ -16,6 +16,12 @@ app.use(cookieParser());
 
 // Статичні файли
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Перенаправлення всіх інших маршрутів на index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 poolPromise
   .then(() => {
