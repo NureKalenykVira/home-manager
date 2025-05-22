@@ -104,13 +104,11 @@ router.delete('/:id', async (req, res) => {
           const blobClient = containerClient.getBlockBlobClient(blobName);
           await blobClient.deleteIfExists();
         }
-        // Якщо ні — старий локальний файл або просто запис без хмарного файлу
         else {
           console.log(`Пропущено: '${filePath}' не є URL`);
         }
       } catch (err) {
         console.warn(`Помилка при обробці файла '${filePath}':`, err.message);
-        // Продовжити, навіть якщо один файл не вдалося видалити
       }
     }
 
