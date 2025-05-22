@@ -15,7 +15,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Статичні файли
-app.use(express.static(path.join(__dirname, 'dist', 'browser')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 poolPromise
