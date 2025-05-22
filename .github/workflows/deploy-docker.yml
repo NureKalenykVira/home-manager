@@ -1,0 +1,52 @@
+name: Deploy Node API to Azure via Docker
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY_NAME: homemanagerregistry.azurecr.io
+  IMAGE_NAME: homemanager-api
+  RESOURCE_GROUP: home-manager-rg
+  WEBAPP_NAME: home-manager-app-linux
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Login to Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_LINUX }}
+
+      # Login to ACR
+      - name: Login to ACR
+        run: |
+          echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ env.REGISTRY_NAME }} \
+            --username ${{ secrets.REGISTRY_USERNAME }} \
+            --password-stdin
+
+      # Build Docker image
+      - name: Build Docker image
+        run: docker build -t ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }} ./home-manager-api
+
+      # Push Docker image to ACR
+      - name: Push image to ACR
+        run: docker push ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}
+
+      # Deploy to Azure App Service (Linux)
+      - name: Deploy to Azure Web App (Linux)
+        run: |
+          az webapp config container set \
+            --name ${{ env.WEBAPP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --docker-custom-image-name ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }} \
+            --docker-registry-server-url https://${{ env.REGISTRY_NAME }} \
+            --docker-registry-server-user ${{ secrets.REGISTRY_USERNAME }} \
+            --docker-registry-server-password ${{ secrets.REGISTRY_PASSWORD }}
