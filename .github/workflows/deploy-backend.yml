@@ -1,0 +1,38 @@
+name: Deploy Backend to Azure
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY_NAME: homemanagerregistry.azurecr.io
+  IMAGE_NAME: homemanager-api
+  RESOURCE_GROUP: home-manager-rg
+  WEBAPP_NAME: home-manager-api
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_LINUX }}
+
+      - name: Login to ACR
+        run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ env.REGISTRY_NAME }} \
+            --username ${{ secrets.REGISTRY_USERNAME }} \
+            --password-stdin
+
+      - name: Build and Push API Image
+        run: |
+          docker build -t ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }} ./backend
+          docker push ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}
+
+      - name: Deploy to Azure Web App
+        run: |
+          az webapp config container set \
+            --name ${{ env.WEBAPP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --docker-custom-image-name ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}
