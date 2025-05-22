@@ -8,6 +8,7 @@ RUN npm install --production
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 80
+ENV PORT=80
 
 CMD ["node", "bin/www"]
