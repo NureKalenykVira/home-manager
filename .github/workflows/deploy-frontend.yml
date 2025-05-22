@@ -21,9 +21,11 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS_LINUX }}
 
       - name: Login to ACR
-        run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ env.REGISTRY_NAME }} \
-            --username ${{ secrets.REGISTRY_USERNAME }} \
+        run: |
+          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login "${{ env.REGISTRY_NAME }}" \
+            --username "${{ secrets.REGISTRY_USERNAME }}" \
             --password-stdin
+
 
       - name: Build and Push Frontend Image
         run: |
