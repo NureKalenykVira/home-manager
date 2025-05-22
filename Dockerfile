@@ -8,7 +8,7 @@ COPY home-manager-project ./home-manager-project
 WORKDIR /app/home-manager-project
 
 RUN npm install
-RUN npm run build -- --configuration production
+RUN npm run build -- --configuration production --output-path=../home-manager-api/dist
 
 # Етап 2: Запуск backend
 FROM node:20
