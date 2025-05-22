@@ -26,10 +26,9 @@ jobs:
             --username "${{ secrets.REGISTRY_USERNAME }}" \
             --password-stdin
 
-
       - name: Build and Push Frontend Image
         run: |
-          docker build -t ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }} ./frontend
+          docker build -t ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }} ./home-manager-project
           docker push ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}
 
       - name: Deploy to Azure Web App
