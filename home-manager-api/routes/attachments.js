@@ -5,16 +5,18 @@ const { poolPromise, sql } = require('../config/db');
 const { BlobServiceClient } = require('@azure/storage-blob');
 const path = require('path');
 
-const AZURE_STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING;
-const containerName = 'task-attachments';
-
-const blobServiceClient = BlobServiceClient.fromConnectionString(AZURE_STORAGE_CONNECTION_STRING);
-const containerClient = blobServiceClient.getContainerClient(containerName);
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// 📥 POST /api/attachments/upload
+function getContainerClient() {
+  const conn = process.env.AZURE_STORAGE_CONNECTION_STRING;
+  if (!conn) {
+    throw new Error('AZURE_STORAGE_CONNECTION_STRING is missing');
+  }
+  const blobServiceClient = BlobServiceClient.fromConnectionString(conn);
+  return blobServiceClient.getContainerClient('task-attachments');
+}
+
 router.post('/upload', upload.single('file'), async (req, res) => {
   const { taskId } = req.body;
   const file = req.file;
@@ -27,8 +29,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     const ext = path.extname(file.originalname);
     const base = path.basename(file.originalname, ext);
     const blobName = `${base}-${Date.now()}${ext}`;
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
+    const containerClient = getContainerClient();
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.uploadData(file.buffer);
     const fileUrl = blockBlobClient.url;
 
@@ -49,7 +52,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// 📤 GET /api/attachments?taskId=...
 router.get('/', async (req, res) => {
   const { taskId } = req.query;
   if (!taskId) return res.status(400).send("taskId is required");
@@ -67,7 +69,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// 🗑 DELETE /api/attachments/:id
 router.delete('/:id', async (req, res) => {
   const id = parseInt(req.params.id);
   if (!id) return res.status(400).send("id is required");
@@ -81,10 +82,18 @@ router.delete('/:id', async (req, res) => {
 
     if (fileResult.recordset.length === 0) return res.status(404).send("Файл не знайдено");
 
-    const fileUrl = fileResult.recordset[0].FilePath;
-    const blobName = path.basename(new URL(fileUrl).pathname);
-    const blobClient = containerClient.getBlockBlobClient(blobName);
-    await blobClient.deleteIfExists();
+    const fileUrl = fileResult.recordset[0]?.FilePath;
+
+    if (fileUrl && typeof fileUrl === 'string' && fileUrl.startsWith('http')) {
+      try {
+        const containerClient = getContainerClient();
+        const blobName = path.basename(new URL(fileUrl).pathname);
+        const blobClient = containerClient.getBlockBlobClient(blobName);
+        await blobClient.deleteIfExists();
+      } catch (err) {
+        console.error("Помилка при видаленні з Blob Storage:", err.message);
+      }
+    }
 
     await pool.request()
       .input('id', sql.Int, id)
