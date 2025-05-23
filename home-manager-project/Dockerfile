@@ -5,5 +5,4 @@ RUN npm install && npm run build -- --configuration production
 
 FROM nginx:alpine
 COPY --from=build /app/dist/home-manager-project /usr/share/nginx/html
-RUN ls -la /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
