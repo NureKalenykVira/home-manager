@@ -10,7 +10,9 @@ const app = express();
 
 app.use(cors({
   origin: 'https://home-manager-frontend-f5ekckframawd8fj.northeurope-01.azurewebsites.net',
-  credentials: true
+  credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
 }));
 app.use(logger('dev'));
 app.use(express.json());
