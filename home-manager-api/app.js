@@ -8,7 +8,10 @@ const { poolPromise } = require('./config/db');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://home-manager-frontend-f5ekckframawd8fj.northeurope-01.azurewebsites.net',
+  credentials: true
+}));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
