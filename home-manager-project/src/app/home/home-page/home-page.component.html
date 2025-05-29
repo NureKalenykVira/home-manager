@@ -1,15 +1,16 @@
 <div class="home-container">
   <div class="topbar">
     <div class="logo">Home Manager</div>
-      <button *ngIf="!hasFamily" routerLink="/family/join" class="family-button">Додати сім’ю</button>
-      <button *ngIf="hasFamily" (click)="openFamilyModal()" class="family-button">Моя сім’я</button>
-      <span class="user-name"> {{ userName }}</span>
+    <button *ngIf="!hasFamily" routerLink="/family/join" class="family-button">Додати сім’ю</button>
+    <button *ngIf="hasFamily" (click)="openFamilyModal()" class="family-button">Моя сім’я</button>
+    <span class="user-name"> {{ userName }}</span>
+    <button class="logout-button" (click)="logout()">Вийти</button>
     <div class="profile-icon">
       <i class="fas fa-user-circle"></i>
     </div>
   </div>
 
-  <div class="content">
+  <div class="content" *ngIf="hasFamily; else noFamilyBlock">
     <div class="sidebar">
       <button
         [class.active]="selectedTab === 'tasks'"
@@ -37,6 +38,12 @@
       <router-outlet></router-outlet>
     </div>
   </div>
+
+  <ng-template #noFamilyBlock>
+    <div class="no-family-message">
+      Увійдіть в родину або створіть свою для початку роботи.
+    </div>
+  </ng-template>
 </div>
 
 <div class="modal-overlay" *ngIf="isModalOpen">

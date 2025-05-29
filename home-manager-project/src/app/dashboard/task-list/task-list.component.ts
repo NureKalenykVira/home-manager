@@ -37,6 +37,11 @@ export class TaskListComponent implements OnInit {
   constructor(public taskService: TaskService, private commentService: CommentService) {}
 
   ngOnInit() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      window.location.href = '/auth/login';
+      return;
+    }
     this.loadInitialData();
   }
 
@@ -130,6 +135,11 @@ refreshTasks(familyId: number) {
     this.closeModal();
   });
 }
+
+  isImage(filePath: string): boolean {
+    const ext = filePath.split('.').pop()?.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'].includes(ext || '');
+  }
 
   toggleCompleted(task: Task) {
     const updatedTask = { ...task, isCompleted: !task.isCompleted };

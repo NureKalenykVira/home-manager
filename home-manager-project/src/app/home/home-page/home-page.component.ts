@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home-page',
@@ -18,9 +19,13 @@ export class HomePageComponent {
   copied = false;
   userName: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService, ) {}
 
   ngOnInit() {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      this.router.navigate(['/auth/login']);
+    }
     this.hasFamily = !!localStorage.getItem('familyId');
     this.joinCode = localStorage.getItem('joinCode') || '';
     this.userName = localStorage.getItem('userName') || '';
@@ -49,11 +54,15 @@ export class HomePageComponent {
   }
 
   navigateToProfile() {
-    // Перехід на профіль користувача
     this.router.navigate(['/profile']);
   }
 
   selectTab(tab: string) {
     this.selectedTab = tab;
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 }

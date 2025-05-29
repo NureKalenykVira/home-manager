@@ -14,6 +14,14 @@
   z-index: 1000;
 }
 
+.preview-image {
+  max-width: 120px;
+  max-height: 120px;
+  margin: 4px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;
