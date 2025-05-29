@@ -21,9 +21,9 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS_LINUX }}
 
       - name: Login to ACR
-        run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ env.REGISTRY_NAME }} \
-            --username ${{ secrets.REGISTRY_USERNAME }} \
-            --password-stdin
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login ${{ env.REGISTRY_NAME }} \
+              --username "${{ secrets.REGISTRY_USERNAME }}" \
+              --password-stdin
 
       - name: Build and Push API Image
         run: |
@@ -35,4 +35,5 @@ jobs:
           az webapp config container set \
             --name ${{ env.WEBAPP_NAME }} \
             --resource-group ${{ env.RESOURCE_GROUP }} \
-            --docker-custom-image-name ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}
+            --docker-custom-image-name ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }} \
+            --docker-registry-server-url https://${{ env.REGISTRY_NAME }}
