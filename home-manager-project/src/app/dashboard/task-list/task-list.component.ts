@@ -37,11 +37,6 @@ export class TaskListComponent implements OnInit {
   constructor(public taskService: TaskService, private commentService: CommentService) {}
 
   ngOnInit() {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      window.location.href = '/auth/login';
-      return;
-    }
     this.loadInitialData();
   }
 
