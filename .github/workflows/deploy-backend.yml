@@ -28,7 +28,7 @@ jobs:
 
       - name: Build and Push API Image
         run: |
-          docker build -t ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }} ./backend
+          docker build -t ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }} ./home-manager-api
           docker push ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}
 
       - name: Deploy to Azure Web App
