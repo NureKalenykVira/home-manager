@@ -24,7 +24,8 @@ export class HomePageComponent {
   ngOnInit() {
     const userId = localStorage.getItem('userId');
     if (!userId) this.router.navigate(['/auth/login']);
-    this.hasFamily = !!localStorage.getItem('familyId');
+    const raw = localStorage.getItem('familyId');
+    this.hasFamily = raw !== null && raw !== 'null' && raw !== '';
     this.joinCode = localStorage.getItem('joinCode') || '';
     this.userName = localStorage.getItem('userName') || '';
   }
