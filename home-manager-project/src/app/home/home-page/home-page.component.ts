@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, RouterModule]
 })
 export class HomePageComponent {
-  familyName: string | null = null; // Це буде витягуватись з бекенду пізніше
+  familyName: string | null = null;
   selectedTab: string = 'tasks';
   hasFamily = false;
   joinCode: string = '';
@@ -23,7 +23,7 @@ export class HomePageComponent {
 
   ngOnInit() {
     const userId = localStorage.getItem('userId');
-    if (!userId) this.router.navigate(['/auth/login']);
+    if (!userId) this.router.navigate(['/login']);
     const raw = localStorage.getItem('familyId');
     this.hasFamily = raw !== null && raw !== 'null' && raw !== '';
     this.joinCode = localStorage.getItem('joinCode') || '';
@@ -62,6 +62,6 @@ export class HomePageComponent {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/login']);
   }
 }
