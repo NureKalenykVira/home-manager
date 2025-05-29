@@ -30,7 +30,7 @@ poolPromise
     // API маршрути
     app.use('/', require('./routes/index'));
     app.use('/users', require('./routes/users'));
-    app.use('/auth', require('./routes/auth'));
+    app.use('/api/auth', require('./routes/auth'));
     app.use('/api/tasks', require('./routes/tasks'));
     app.use('/api/family', require('./routes/family'));
     app.use('/api/shopping', require('./routes/shopping'));
