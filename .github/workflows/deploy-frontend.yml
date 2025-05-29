@@ -7,8 +7,9 @@ on:
 env:
   REGISTRY_NAME: homemanagerregistry.azurecr.io
   IMAGE_NAME: homemanager-frontend
+  IMAGE_TAG: latest
   RESOURCE_GROUP: home-manager-rg
-  WEBAPP_NAME: home-manager-frontend
+  WEBAPP_NAME: home-manager-front
 
 jobs:
   build-and-deploy:
@@ -34,12 +35,12 @@ jobs:
 
       - name: Build and Push Frontend Image
         run: |
-          docker build -t ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }} ./home-manager-project
-          docker push ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}
+          docker build --no-cache -t ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ./home-manager-project
+          docker push ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
       - name: Deploy to Azure Web App
         run: |
           az webapp config container set \
             --name ${{ env.WEBAPP_NAME }} \
             --resource-group ${{ env.RESOURCE_GROUP }} \
-            --docker-custom-image-name ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}
+            --docker-custom-image-name ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
