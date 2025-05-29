@@ -7,7 +7,7 @@ const { poolPromise, sql } = require('../config/db');
 const SECRET_KEY = process.env.JWT_SECRET || 'your_secret_key';
 
 // POST /api/auth/register
-router.post('/register', async (req, res) => {
+router.post('/api/register', async (req, res) => {
     console.log('Отримано логін-запит із тілом:', req.body);
     const { email, password, userName } = req.body;
 
@@ -37,7 +37,7 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/api/login', async (req, res) => {
   console.log('🔐 Отримано логін-запит із тілом:', req.body);
 
   const { email, password } = req.body;
