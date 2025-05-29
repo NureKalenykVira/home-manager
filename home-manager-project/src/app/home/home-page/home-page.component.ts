@@ -22,10 +22,8 @@ export class HomePageComponent {
   constructor(private router: Router, private authService: AuthService, ) {}
 
   ngOnInit() {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      this.router.navigate(['/auth/login']);
-    }
+    const userId = localStorage.getItem('userId');
+    if (!userId) this.router.navigate(['/auth/login']);
     this.hasFamily = !!localStorage.getItem('familyId');
     this.joinCode = localStorage.getItem('joinCode') || '';
     this.userName = localStorage.getItem('userName') || '';

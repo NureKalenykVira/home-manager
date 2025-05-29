@@ -19,20 +19,20 @@
         <p><strong>Створено:</strong> {{ task.createdAt | date:'dd.MM.yyyy, HH:mm' }}</p>
         <p><strong>Відповідальний:</strong> {{ getAssigneeName(task.assigneeId) }}</p>
         <div class="attachments-list" *ngIf="attachments[task.taskId]?.length">
-          <p><strong>Вкладення:</strong></p>
-          <ul>
-            <li *ngFor="let file of attachments[task.taskId]">
-              <ng-container *ngIf="isImage(file.FilePath); else downloadLink">
-                <img [src]="file.FilePath" alt="Зображення" class="preview-image" />
-              </ng-container>
-              <ng-template #downloadLink>
-                <a [href]="file.FilePath" target="_blank">
-                 {{ extractFileName(file.FilePath) }}
-                </a>
-              </ng-template>
-            </li>
-          </ul>
-        </div>
+        <p><strong>Вкладення:</strong></p>
+        <ul>
+          <li *ngFor="let file of attachments[task.taskId]">
+            <ng-container *ngIf="isImage(file.fullUrl); else downloadLink">
+              <img [src]="file.fullUrl" alt="Зображення" class="preview-image" />
+            </ng-container>
+            <ng-template #downloadLink>
+              <a [href]="file.fullUrl" target="_blank">
+                {{ extractFileName(file.FilePath) }}
+              </a>
+            </ng-template>
+          </li>
+        </ul>
+      </div>
 
         <button class="close-btn" (click)="openDeleteConfirm(task.taskId)">
           Видалити завдання

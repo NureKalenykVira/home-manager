@@ -211,7 +211,10 @@ refreshTasks(familyId: number) {
 
   loadAttachments(taskId: number) {
     this.taskService.getAttachments(taskId).subscribe(files => {
-      this.attachments[taskId] = files;
+      this.attachments[taskId] = files.map(file => ({
+        ...file,
+        fullUrl: `${this.uploadsUrl}/${file.FilePath}`
+      }));
     });
   }
 
